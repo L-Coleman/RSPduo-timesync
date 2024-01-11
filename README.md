@@ -1,6 +1,11 @@
 # RSPduo dual tuner mode experiments
 
-A collection of tools, programs, and scripts to experiment with the SDRplay RSPduo in dual tuner mode
+## PPS Time Synchronization
+
+A collection of tools, programs, and scripts to experiment with the SDRplay RSPduo in dual tuner mode that aim to create a time synchronization to pulse per second. This is designed for use with a raspberry pi, where PPS is fed to GPIO17 (pin 11 on 4B header). The time delta in microseconds will be printed in the filename between the rising PPS edge and the first callback function. When analyzing the IQ data later, you can adjust to (1-timedelta) to obtain the correct PPS start during the next second. This script uses the pigpio.h library to poll the GPIO chipset. 
+
+Currently there are still latency issues. Using a server image of Ubuntu 22.04LTS, nice values of -20 on the sdrplay API, and the script switches to a FIFO scheduler for the data collection and GPIO polling, but there is still maybe 150us of drift.
+
 
 ## dual_tuner_recorder
 
@@ -45,37 +50,9 @@ Here are some usage examples:
 ./dual_tuner_recorder -r 8000000 -i 2048 -b 1536 -l 3 -f 162550000 -o noaa-8M-SAMPLERATEk-%c.iq16
 ```
 
-## fm_player
-
-A simple Python script that demodulates a file containing an I/Q stream contaning a NBFM signal (see `dual_tuner_recorder` above) and shows a frequency plot of the I/Q stream.
-This script uses GNU Radio blocks and therefore requires a recent version of GNU Radio to run.
-
-These are the command line options for `fm_player`:
-
-    -i <input file> - mandatory
-    -s <sample rate> - mandatory
-    -o <frequency offset> - default: 0
-    -N (FM block: NBFM receive)
-    -D (FM block: FM demod)
-    -v <volume> - default: 0.3
-    -f <center frequency for frequency display> - default: 0
-    -W (wait for user input) - default: False
-
-
-Here are some usage examples:
-
-- play the I/Q stream for channel A from the first example above (please note that the estimated sample rate in the file name might be slightly different; for instance in my case it was 'noaa-6M-2002k-A.iq16'; you may still want to use the command line option `-s 2e6`):
-```
-./fm_player.py -i noaa-6M-2000k-A.iq16 -s 2e6 -f 162550000
-```
-
-- play the I/Q stream for channel B from the second example above (see note in the previous example about the I/Q stream recording file name):
-```
-./fm_player.py -i noaa-8M-2000k-B.iq16 -s 2e6 -f 162550000
-```
 
 
 ## Copyright
+(C) 2024 Lawrence Coleman
+(C) 2022 Franco Venturi - Licensed under the GNU GPL V3 
 
-(C) 2022 Franco Venturi - Licensed under the GNU GPL V3 (see [LICENSE](LICENSE))
-# working on it
